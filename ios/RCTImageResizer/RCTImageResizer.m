@@ -96,19 +96,8 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
     CGSize newSize = CGSizeMake(width, height);
     NSString* fullPath = generateFilePath(@"jpg", outputPath);
 
-    [_bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
-        if (error || image == nil) {
-            if ([path hasPrefix:@"data:"] || [path hasPrefix:@"file:"]) {
-                NSURL *imageUrl = [[NSURL alloc] initWithString:path];
-                image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
-            } else {
-                image = [[UIImage alloc] initWithContentsOfFile:path];
-            }
-            if (image == nil) {
-                callback(@[@"Can't retrieve the file from the path.", @""]);
-                return;
-            }
-        }
+    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:path]]];
+
 
         // Rotate image if rotation is specified.
         if (0 != (int)rotation) {
@@ -133,7 +122,6 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
         }
         
         callback(@[[NSNull null], fullPath]);
-    }];
 }
 
 @end
