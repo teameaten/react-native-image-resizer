@@ -4,4 +4,9 @@ declare module "react-native-image-resizer" {
         format: "PNG" | "JPEG" | "WEBP", quality: number,
         rotation?: number, outputPath?: string
     ): Promise<string>;
+    export function createResizedImageURL(
+        uri: string, width: number, height: number,
+        format: "PNG" | "JPEG" | "WEBP", quality: number,
+        rotation?: number, outputPath?: string
+    ): Promise<string>;
 }

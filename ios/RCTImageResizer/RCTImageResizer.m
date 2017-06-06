@@ -84,6 +84,46 @@ UIImage * rotateImage(UIImage *inputImage, float rotationDegrees)
     }
 }
 
+
+RCT_EXPORT_METHOD(createResizedImageURL:(NSString *)path
+                  width:(float)width
+                  height:(float)height
+                  format:(NSString *)format
+                  quality:(float)quality
+                  rotation:(float)rotation
+                  outputPath:(NSString *)outputPath
+                  callback:(RCTResponseSenderBlock)callback)
+{
+    CGSize newSize = CGSizeMake(width, height);
+    NSString* fullPath = generateFilePath(@"jpg", outputPath);
+    
+    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:path]]];
+        
+    // Rotate image if rotation is specified.
+    if (0 != (int)rotation) {
+        image = rotateImage(image, rotation);
+        if (image == nil) {
+            callback(@[@"Can't rotate the image.", @""]);
+            return;
+        }
+    }
+    
+    // Do the resizing
+    UIImage * scaledImage = [image scaleToSize:newSize];
+    if (scaledImage == nil) {
+        callback(@[@"Can't resize the image.", @""]);
+        return;
+    }
+    
+    // Compress and save the image
+    if (!saveImage(fullPath, scaledImage, format, quality)) {
+        callback(@[@"Can't save the image. Check your compression format.", @""]);
+        return;
+    }
+    
+    callback(@[[NSNull null], fullPath]);
+}
+
 RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
                   width:(float)width
                   height:(float)height
